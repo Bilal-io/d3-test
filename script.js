@@ -10,7 +10,7 @@
   positionY = 20;
 
   function createCircle() {
-    const circles = svg
+    let circles = svg
       .datum({
         x: positionX,
         y: positionY,
@@ -32,13 +32,12 @@
       .attr("transform", "scale(1)");
 
     circles.on("click", function(d, i, e) {
-      d3.event.stopPropagation();
+      let datum = d3.select(this).datum();
 
-      const datum = circles.datum();
       if (e[0].nodeName == "circle") {
-        if (circles.datum().selected) {
+        if (datum.selected) {
           datum.selected = false;
-          circles
+          d3.select(this)
             .datum(datum)
             .transition()
             .duration(200)
@@ -67,7 +66,10 @@
         circle.startY = d3.event.y;
       })
       .on("drag", function(circle) {
+        datum = d3.select(this).datum();
+
         document.querySelector(".remove").disabled = false;
+
         d3.select(this)
           .attr("stroke", "#455A64")
           .attr("stroke-width", "3px");
@@ -79,28 +81,31 @@
         ) {
           circle.x = d3.event.x;
           circle.y = d3.event.y;
-          d3.select(this).attr(
-            "transform",
-            `translate(${circle.x - 21},${circle.y - 21}) scale(1)`
-          );
+          d3.select(this)
+            .datum(datum)
+            .attr(
+              "transform",
+              `translate(${circle.x - 21},${circle.y - 21}) scale(1)`
+            );
         }
-        circle.selected = true;
-      })
-      .on("end", d => {});
+        datum.selected = true;
+      });
 
     dragHandler(circles);
   }
 
   function deselectAll() {
-    document.querySelector(".remove").disabled = true;
-    d3.event.stopPropagation();
-    d3.selectAll("circle").each(function(d, i) {
-      d3.select(this)
-        .transition()
-        .duration(200)
-        .attr("stroke-width", "0px");
-      d3.select(this).datum().selected = false;
-    });
+    if (this.nodeName == "svg") {
+      document.querySelector(".remove").disabled = true;
+      d3.event.stopPropagation();
+      d3.selectAll("circle").each(function(d, i) {
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr("stroke-width", "0px");
+        d3.select(this).datum().selected = false;
+      });
+    }
   }
 
   document.querySelector(".add").addEventListener("click", () => {
