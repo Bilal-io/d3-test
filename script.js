@@ -36,7 +36,6 @@
 
       const datum = circles.datum();
       if (e[0].nodeName == "circle") {
-        console.log("clicked circle");
         if (circles.datum().selected) {
           datum.selected = false;
           circles
@@ -86,11 +85,8 @@
           );
         }
         circle.selected = true;
-        console.log("dragging");
       })
-      .on("end", d => {
-        console.log("ended dragging");
-      });
+      .on("end", d => {});
 
     dragHandler(circles);
   }
